@@ -30,27 +30,34 @@ public class ConnectionServlet extends HttpServlet {
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 		String nume=request.getParameter("nume");
 		String parola=request.getParameter("parola");
-		//verificare user si parola introduse
-		if(Securitate.tipUser(nume,parola).equals("a"))
-			{
-				request.getSession().putValue("user", "admin");
-				request.getRequestDispatcher("admin.jsp").forward(request,response);
-			}
-		else 
-			if(Securitate.tipUser(nume,parola).equals("p")){
-				request.getSession().putValue("idUser", Securitate.returnId(nume, parola));
-				request.getRequestDispatcher("profesor.jsp").forward(request,response);
-			}
-			else
-				if(Securitate.tipUser(nume,parola).equals("s")){
+		if(nume==null||nume==""||parola==null||parola=="")
+		{
+			request.setAttribute("invalid", "Campurile Nume Utilizator si Parola sunt obligatorii! ");
+			request.getRequestDispatcher("PaginaPrincipala.jsp").forward(request,response);
+		}
+		else
+		{	//verificare user si parola introduse
+			if(Securitate.tipUser(nume,parola).equals("a"))
+				{
+					request.getSession().putValue("user", "admin");
+					request.getRequestDispatcher("admin.jsp").forward(request,response);
+				}
+			else 
+				if(Securitate.tipUser(nume,parola).equals("p")){
 					request.getSession().putValue("idUser", Securitate.returnId(nume, parola));
-					request.getRequestDispatcher("student.jsp").forward(request,response);
+					request.getRequestDispatcher("profesor.jsp").forward(request,response);
 				}
 				else
-					{
-						request.setAttribute("invalid", "Userul incorect/Parola incorecta");
-						request.getRequestDispatcher("PaginaPrincipala.jsp").forward(request,response);
-					}					
+					if(Securitate.tipUser(nume,parola).equals("s")){
+						request.getSession().putValue("idUser", Securitate.returnId(nume, parola));
+						request.getRequestDispatcher("student.jsp").forward(request,response);
+					}
+					else
+						{
+							request.setAttribute("invalid", "Userul incorect/Parola incorecta");
+							request.getRequestDispatcher("PaginaPrincipala.jsp").forward(request,response);
+						}		
+		}
 		System.out.println("Utilizatorul a introdus: "+nume+" "+parola);
 	}
 

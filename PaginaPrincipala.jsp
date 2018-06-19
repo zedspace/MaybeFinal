@@ -9,28 +9,34 @@
 <title>Catalogul virtual al studentului</title>
 </head>
 <body>    
-<img src="logo.gif" height="100" width="500" alt="logo" class="img"/>
-<%if(request.getAttribute("invalid")!=null){ %>
-<p style="font-size:20px;color:red;"><%=request.getAttribute("invalid")%></p>
-<%}%>
-<div class="wrap">  
-    <form method="post" name="from" onsubmit="return validare();" action="ConnectionServlet">
-    	<table align="center">
-    	<tr>
-    	<td><p>Acceseaza platforma:</p></td>
-    	</tr>
-    	<tr>
-		<td><input type="text" name="nume" id="nume" placeholder="Nume de utilizator" required/></td>
-		</tr>
-		<tr>
-		<td><input type="password" name="parola" id="parola" placeholder="Parola" required/></td>
-		</tr>
-		<tr>
-		<td colspan="2" align="center"><button type="submit">Conectare</button></td>
-		</tr>		
-		</table>
-	</form>
-</div>
+	<img src="logo.gif" height="100" width="500" alt="logo" class="img"/>
+	
+	
+	<%if(request.getAttribute("invalid")!=null){ %>
+	    <div class="alert" align="center">
+			<span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+		    <strong>Atentie!</strong><%=request.getAttribute("invalid")%>
+		</div>
+	<%}%>
+	
+	<div class="wrap">  
+	    <form method="post" name="from" onsubmit="return validare();" action="ConnectionServlet">
+	    	<table align="center">
+		    	<tr>
+		    		<td><p>Acceseaza platforma:</p></td>
+		    	</tr>
+		    	<tr>
+					<td><input type="text" name="nume" id="nume" placeholder="Nume de utilizator" required/></td>
+				</tr>
+				<tr>
+					<td><input type="password" name="parola" id="parola" placeholder="Parola" required/></td>
+				</tr>
+				<tr>
+					<td colspan="2" align="center"><button type="submit">Conectare</button></td>
+				</tr>		
+			</table>
+		</form>
+	</div>
 </body>
 <script>
 function validare(){
@@ -39,7 +45,7 @@ function validare(){
          var valid = true;
          if(nume=="" || parola=="" || nume==null ||parola==null)
              {
-                 alert("Toate campurile sunt obligatorii");
+                 alert("Campurile Nume Utilizator si Parola sunt obligatorii!");
                  valid = false;
              }
          return valid;
