@@ -25,7 +25,13 @@
     </div>
     
     <div class="continut"><h1>Bine ai venit!</h1>
-    <h2>Utilizatorul conectat: <%=request.getSession().getValue("user") %></h2>
+   	 <%if(request.getSession().getValue("user")==null)
+    	{%>
+    		 <h2>Va rugam sa reveniti pe pagina de autentificare!</h2>
+    	<%}
+    	else{%>
+    	<h2>Utilizatorul conectat: <%=request.getSession().getValue("user") %></h2>
+   		 <%} %>
 	</div>  
 
 </body>
