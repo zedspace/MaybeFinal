@@ -36,38 +36,59 @@ public class UpdateServletDep extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		response.getWriter().append("Served at: ").append(request.getContextPath());
+		
 		Departament depExistent=null;
 		List<Profesor> listaProfesori=new ArrayList<Profesor>();
 		String denumire_departament=null;
 		String cod_departament;
 		//prelucrari admin departamente
 	
-		if(request.getParameter("denumire_dep") != null && request.getParameter("denumire_dep")!="")
-		{
-			depExistent=PrelucrariDB.returnDepartamente(request.getParameter("denumire_dep"));
-			System.out.println(depExistent.getCod_departament());
-			if(depExistent==null||depExistent.getCod_departament()==0)
-			{
-				PrelucrariDB.insertDepartament(request.getParameter("denumire_dep"));
-				System.out.println("S-a inserat departamentul "+request.getParameter("denumire_dep"));
-				request.setAttribute("succes","Departamentul "+ request.getParameter("denumire_dep")+" a fost inserat cu succes!" );
-			}
-			else
-				{
-					request.setAttribute("exista","Departamenul exista deja" );
-				}
-			request.getRequestDispatcher("departamente.jsp").forward(request,response);
-		}
-		else
-		{
-			if(request.getParameter("cod_dept")!=null)
-			{	
-				PrelucrariDB.actualizeazaDepartament(request.getParameter("cod_dept"), request.getParameter("denumire_departament"));
-				System.out.println("S-a actualizat departamentul "+request.getParameter("cod_dept"));
-				request.getRequestDispatcher("departamente.jsp").forward(request,response);
-			}
-		}
 		
+		//System.out.println("Butonul de adugare are valoarea: "+request.getParameter("adaugaSubmit"));
+		//if(request.getParameter("adaugaSubmit")!=null){
+			if(request.getParameter("denumire_dep") != null && request.getParameter("denumire_dep")!="")
+			{
+				depExistent=PrelucrariDB.returnDepartamente(request.getParameter("denumire_dep"));
+				System.out.println(depExistent.getCod_departament());
+				if(depExistent==null||depExistent.getCod_departament()==0)
+				{
+					PrelucrariDB.insertDepartament(request.getParameter("denumire_dep"));
+					System.out.println("S-a inserat departamentul "+request.getParameter("denumire_dep"));
+					request.setAttribute("succes","Departamentul "+ request.getParameter("denumire_dep")+" a fost inserat cu succes!" );
+				}
+				else
+					{
+						request.setAttribute("exista","Departamenul exista deja" );
+					}
+			}
+		//}
+		
+		//Modificarea denumirii departamentului
+		if(request.getParameter("cod_dept")!=null)
+		{	
+			if(PrelucrariDB.returnDepartamente(request.getParameter("cod_dept")).getDenumire_departament()!=request.getParameter("den_dep") && request.getParameter("den_dep")!="" && request.getParameter("den_dep")!=null){
+				PrelucrariDB.actualizeazaDepartament(request.getParameter("cod_dept"), request.getParameter("den_dep"));
+				System.out.println("S-a actualizat departamentul "+request.getParameter("cod_dept"));
+				request.setAttribute("succes", "Denumirea departamentului a fost modificata cu succes!");
+			}
+		}
+			
+		if(request.getParameter("vizualizare")!=null)
+		{	
+			if(request.getParameter("vizualizare")!=null&&request.getParameter("vizualizare")!="")
+			{	 
+				cod_departament=request.getParameter("vizualizare");
+				System.out.println("S-au afisat profesorii din departamentul cu codul: "+cod_departament);
+				listaProfesori=PrelucrariDB.returnProfesor(Integer.parseInt(cod_departament));
+				System.out.println(listaProfesori);
+				denumire_departament=PrelucrariDB.returnDepartamente(Integer.parseInt(cod_departament)).getDenumire_departament();
+				request.setAttribute("departament", denumire_departament);
+				request.setAttribute("listaProfesori", listaProfesori);
+			}
+			if(listaProfesori.isEmpty())
+				request.setAttribute("inexistent", "Nu exista profesori in departamentul "+ denumire_departament);
+			System.out.println("S-au afisat profesorii din departamentul: "+denumire_departament);
+		}
 		
 		//Prelucrari nefolosite
 		if(request.getParameter("sterge")!=null)
@@ -76,25 +97,7 @@ public class UpdateServletDep extends HttpServlet {
 			System.out.println("S-a sters departamentul "+request.getParameter("sterge"));
 			request.getRequestDispatcher("departamente.jsp").forward(request,response);
 		}
-	
-		if(request.getParameter("vezi")!=null)
-		{	
-			if(request.getParameter("departament")!=null&&request.getParameter("departament")!="")
-			{	 
-				cod_departament=request.getParameter("departament");
-				System.out.println("S-au afisat profesorii din departamentul cu codul: "+cod_departament);
-				listaProfesori=PrelucrariDB.returnProfesor(Integer.parseInt(cod_departament));
-				denumire_departament=PrelucrariDB.returnDepartamente(Integer.parseInt(cod_departament)).getDenumire_departament();
-				request.setAttribute("departament", denumire_departament);
-				request.setAttribute("listaProfesori", listaProfesori);
-			}
-			else
-				request.setAttribute("inexistent", "Nu a fost selectat niciun departament!");
-			System.out.println("S-au afisat profesorii din departamentul: "+denumire_departament);
-			request.getRequestDispatcher("departamente.jsp").forward(request,response);
-		}
-		
-
+		request.getRequestDispatcher("departamente.jsp").forward(request,response);
 	}
 
 	/**
