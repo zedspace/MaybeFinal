@@ -23,7 +23,7 @@
     <a href="studenti.jsp">Studenti</a>
     <a href="profesori.jsp">Profesori</a> 
     <a href="conturi.jsp">Conturi</a>
-    <a href="PaginaPrincipala.jsp">Delogare</a>
+    <a href="PaginaPrincipala.jsp">Deconectare</a>
     </div>
     
     <div class="continut" align="center">
@@ -40,10 +40,16 @@
 		    <strong><%=request.getAttribute("succes")%></strong>
 		</div>
 	<%}%>
+	<%if(request.getAttribute("invalid")!=null){ %>
+	    <div class="alert">
+			<span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+		    <strong>Atentie!</strong><%=request.getAttribute("invalid")%>
+		</div>
+	<%}%>
 	
+	<form name="form" method="post" action="UpdateServletAn">
 	<fieldset>
  		<legend>Ani universitari disponibili</legend>
-    <form name="form" method="post" action="UpdateServletAn">
     <table>
     	<tr>
     		<td>Id An</td>
@@ -59,7 +65,7 @@
     	</tr>
     	<%}%> 	
 	</table>  
-	</form>
+
 	</fieldset> 
 	
 	<button type="button" onclick="location.href = 'admin.jsp';">Inapoi</button>
@@ -69,27 +75,27 @@
 	<div id="adaugareAnUniv" style="display: none;">
 		<fieldset>
  		<legend>Adauga un an universitar</legend>
-			<form id="adaugaAn" method="post" action="UpdateServletAn">
+			
 				<table>
 					<tr>
 						<td colspan="2">Adauga un an universitar</td>
 					</tr>
 					<tr>
 						<td>Denumirea anului</td>
-						<td><input type="text" name="denumire_an" id="denumire_an"/></td>
+						<td><input type="text" name="den_an" id="den_an"/></td>
 					</tr>
 					<tr>
 						<td>Semestrul</td>
-						<td><input type="text" name="semestrul" id="semestrul"/></td>
+						<td><input type="text" name="sem" id="sem"/></td>
 					</tr>
 					<tr>
-						<td colspan="2" align="center"><button type="submit" name="adaugaSubmit" id="adaugaSubmit">Adauga anul</button></td>
+						<td colspan="2" align="center"><button type="button" name="adaugaSubmit" id="adaugaSubmit"  onclick="myFunction()">Adauga anul</button></td>
 					</tr>
 				</table>
-			</form>
+			
 		</fieldset>
 	</div>
-    
+    </form>
 </div>  
 </div>
 
@@ -98,9 +104,28 @@ function showFunctionAdd() {
     var x = document.getElementById("adaugareAnUniv");
     if (x.style.display === "none") {
         x.style.display = "block";
-    } else {
-        x.style.display = "none";
-    }
+    } 
+}
+function myFunction(){
+	var denumire_adaugare=document.getElementById("den_an").value;
+	var semestrul=document.getElementById("sem").value;
+	if(denumire_adaugare!=null && denumire_adaugare!='' && semestrul!=null && semestrul!=""){
+		if (confirm('Confirmati adaugarea noului an universitar: '+document.getElementById("den_an").value+" sem "+document.getElementById("sem").value+'?'))
+		{	
+			accept = true;
+		}
+		else
+			accept = false;
+	}
+	else
+		{
+			alert("Pentru adugarea unui nou an universitar trebuie completate campurile 'Denumirea anului' si 'Semestrul'!");
+			accept = false;
+		}
+	if(accept==true)
+		{
+			document.form.submit();
+		}
 }
 </script>
 </body>
