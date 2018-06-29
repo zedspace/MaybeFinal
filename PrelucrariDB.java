@@ -12,15 +12,12 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import com.mysql.fabric.xmlrpc.base.Array;
-
 import claseResurse.AfisarePondere;
 import claseResurse.AfisarePredare;
 import claseResurse.AnUniversitar;
 import claseResurse.Cont;
 import claseResurse.Departament;
 import claseResurse.Disciplina;
-import claseResurse.Evaluare;
 import claseResurse.Grupa;
 import claseResurse.Notare;
 import claseResurse.Pondere;
@@ -68,14 +65,14 @@ public class PrelucrariDB {
 		Connection con=ConexiuneDB.conectare();		
 		try{
 			if(con!=null){
-			PreparedStatement stmt= con.prepareStatement("select * from specializare");
+			PreparedStatement stmt= con.prepareStatement("select * from specializare order by program_studii,denumire_specializare");
 			ResultSet rs=stmt.executeQuery(); 
 			while(rs.next())  
 			{	
 				Specializare specializare=new Specializare();
 				specializare.setCod_specializare(Integer.parseInt(rs.getString("cod_specializare")));
 				specializare.setDenumire_specializare(rs.getString("denumire_specializare"));
-				specializare.setForma_invatamant(rs.getString("forma_invatamant"));
+				specializare.setProgram_studii(rs.getString("program_studii"));
 				listaSpecializari.add(specializare);			
 			}
 			ConexiuneDB.closeResources(con, rs, stmt);
@@ -103,7 +100,7 @@ public class PrelucrariDB {
 					
 					specializare.setCod_specializare(Integer.parseInt(rs.getString("cod_specializare")));
 					specializare.setDenumire_specializare(rs.getString("denumire_specializare"));
-					specializare.setForma_invatamant(rs.getString("forma_invatamant"));	
+					specializare.setProgram_studii(rs.getString("program_studii"));	
 					
 				}
 				ConexiuneDB.closeResources(con, rs, stmt);
@@ -117,38 +114,12 @@ public class PrelucrariDB {
 			return specializare;		
 		}
 
-		public static Specializare returnSpecializareaStudentului(int id_grupa){	
-			Connection con=ConexiuneDB.conectare();	
-			Specializare specializare=new Specializare();
-			try{
-				if(con!=null){
-				PreparedStatement stmt= con.prepareStatement("select * from grupa join specializare "
-						+ "on grupa.specializare_cod_specializare=specializare.cod_specializare"
-						+ " where grupa.id_grupa=?");
-				stmt.setInt(1, id_grupa);
-				ResultSet rs=stmt.executeQuery();
-				while(rs.next())  
-				{	
-					specializare.setCod_specializare(Integer.parseInt(rs.getString("cod_specializare")));
-					specializare.setDenumire_specializare(rs.getString("denumire_specializare"));
-					specializare.setForma_invatamant(rs.getString("forma_invatamant"));	
-				}
-				ConexiuneDB.closeResources(con, rs, stmt);
-				}	
-				
-			}
-			catch(SQLException e)
-			{
-				e.printStackTrace();
-			}	
-			return specializare;		
-		}
 		public static Specializare returnSpecializare(String denumire_specializare,String forma_invatamant){	
 			Connection con=ConexiuneDB.conectare();	
 			Specializare specializare=new Specializare();
 			try{
 				if(con!=null){
-				PreparedStatement stmt= con.prepareStatement("select * from specializare where denumire_specializare=? and forma_invatamant=?");
+				PreparedStatement stmt= con.prepareStatement("select * from specializare where denumire_specializare=? and program_studii=?");
 				stmt.setString(1, denumire_specializare);
 				stmt.setString(2, forma_invatamant);
 				System.out.println(stmt);
@@ -158,7 +129,7 @@ public class PrelucrariDB {
 					
 					specializare.setCod_specializare(Integer.parseInt(rs.getString("cod_specializare")));
 					specializare.setDenumire_specializare(rs.getString("denumire_specializare"));
-					specializare.setForma_invatamant(rs.getString("forma_invatamant"));	
+					specializare.setProgram_studii(rs.getString("program_studii"));	
 					
 				}
 				System.out.println(specializare.getCod_specializare());
@@ -522,41 +493,6 @@ public class PrelucrariDB {
 			return listaPredare;		
 		}
 		
-		public static List<Preda> returnPredaLaSpecializare(int marca,int cod_specializare,int an_univ){
-			List<Preda> listaPredare=new ArrayList<Preda>();
-			Connection con=ConexiuneDB.conectare();		
-			try{
-				if(con!=null){
-				PreparedStatement stmt= con.prepareStatement("select * from preda " 
-						+"join grupa on grupa.id_grupa=preda.grupa_id_grupa " 
-						+"join specializare on specializare.cod_specializare=grupa.specializare_cod_specializare "
-						+"where preda.profesor_marca=? "
-						+"and preda.an_universitar_id_an_universitar=? "
-						+"and specializare.cod_specializare=? group by preda.disciplina_id_disciplina");
-				stmt.setInt(1,marca);
-				stmt.setInt(2,cod_specializare);
-				stmt.setInt(3,an_univ);
-				ResultSet rs=stmt.executeQuery(); 
-				while(rs.next())  
-				{	
-					Preda predare= new Preda();
-					predare.setId_preda(rs.getInt("id_preda"));
-					predare.setProfesor_marca(rs.getInt("profesor_marca"));
-					predare.setDisciplina_id_disciplina(rs.getInt("disciplina_id_disciplina"));
-					predare.setAn_universitar_id_an_universitar(rs.getInt("an_universitar_id_an_universitar"));
-					predare.setGrupa_id_grupa(rs.getInt("grupa_id_grupa"));
-					listaPredare.add(predare);					
-				}
-				ConexiuneDB.closeResources(con, rs, stmt);
-				}				
-			}
-			catch(SQLException e)
-			{
-				e.printStackTrace();
-			}	
-			return listaPredare;		
-		}
-		
 		public static List<AfisarePredare> afisarePredare(List<Preda> listaPredare)
 		{
 			List<AfisarePredare> predareProfesori=new ArrayList<AfisarePredare>();
@@ -656,7 +592,7 @@ public class PrelucrariDB {
 						{	
 							spec.setCod_specializare(Integer.parseInt(rs4.getString("cod_specializare")));
 							spec.setDenumire_specializare(rs4.getString("denumire_specializare"));
-							spec.setForma_invatamant(rs4.getString("forma_invatamant"));
+							spec.setProgram_studii(rs4.getString("program_studii"));
 							
 						}
 						for(Specializare sp: predareSpecializare)
@@ -702,37 +638,6 @@ public class PrelucrariDB {
 			}	
 		}
 		
-		public static Pondere returnPondere(int id_disciplina,int cod_specializare){
-			Pondere pondere=new Pondere();
-			Connection con=ConexiuneDB.conectare();		
-			try{
-				if(con!=null){
-				PreparedStatement stmt= con.prepareStatement("select * from "+
-				"stabileste_pondere join grupa on stabileste_pondere.grupa_id_grupa=grupa.id_grupa "
-				+ "join specializare on specializare.cod_specializare=grupa.specializare_cod_specializare "
-				+ "where stabileste_pondere.disciplina_id_disciplina=? and specializare.cod_specializare=?");
-				stmt.setInt(1, id_disciplina);
-				stmt.setInt(2, cod_specializare);
-				ResultSet rs=stmt.executeQuery(); 
-				while(rs.next())  
-				{	
-					pondere.setId_pondere(rs.getInt("id_pondere"));
-					pondere.setProfesor_marca(rs.getInt("profesor_marca"));
-					pondere.setDisciplina_id_disciplina(rs.getInt("disciplina_id_disciplina"));
-					pondere.setAn_universitar_id_an_universitar(rs.getInt("an_universitar_id_an_universitar"));
-					pondere.setGrupa_id_grupa(rs.getInt("grupa_id_grupa"));
-					pondere.setPondere(rs.getInt("pondere"));				
-				}
-				ConexiuneDB.closeResources(con, rs, stmt);
-				}				
-			}
-			catch(SQLException e)
-			{
-				e.printStackTrace();
-			}	
-			return pondere;		
-		}
-		
 		public static void insertNota(Date data,int numar_matricol,int marca_profesor,int id_disciplina,int nota)
 		{
 			Connection con=ConexiuneDB.conectare();		
@@ -755,108 +660,6 @@ public class PrelucrariDB {
 			{
 				e.printStackTrace();
 			}	
-		}
-		
-		public static void updateNota(Date data,int numar_matricol,int marca_profesor,int id_disciplina,int nota)
-		{
-			Connection con=ConexiuneDB.conectare();		
-			try{
-				if(con!=null){
-				PreparedStatement stmt= con.prepareStatement("update notare"+
-				" set data=?,nota=? where student_numar_matricol=? and profesor_marca=? and disciplina_id_disciplina=?");
-				stmt.setDate(1,data);
-				stmt.setInt(2,nota);
-				stmt.setInt(3,numar_matricol);
-				stmt.setInt(4,marca_profesor);
-				stmt.setInt(5,id_disciplina);
-				System.out.println(stmt);
-				stmt.execute(); 
-				con.close();
-				}				
-			}
-			catch(SQLException e)
-			{
-				e.printStackTrace();
-			}	
-		}
-		
-		public static void insertEvaluare(int marca_profesor,int numar_matricol,int id_disciplina,int id_grupa,int id_an_universitar,int nr_evaluare,Date data)
-		{
-			Connection con=ConexiuneDB.conectare();		
-			try{
-				if(con!=null){
-				PreparedStatement stmt= con.prepareStatement("insert into evaluare"+
-			"(profesor_marca,student_numar_matricol,disciplina_id_disciplina,grupa_id_grupa,an_universitar_id_an_universitar,numar_evaluare,data_evaluare) "+
-			"values (?,?,?,?,?,?,?)");
-				stmt.setInt(1,marca_profesor);
-				stmt.setInt(2,numar_matricol);
-				stmt.setInt(3,id_disciplina);
-				stmt.setInt(4,id_grupa);
-				stmt.setInt(5,id_an_universitar);
-				stmt.setInt(6,nr_evaluare);
-				stmt.setDate(7,data);
-				System.out.println(stmt);
-				stmt.execute(); 
-				con.close();
-				}				
-			}
-			catch(SQLException e)
-			{
-				e.printStackTrace();
-			}	
-		}
-		
-		public static void updateEvaluare(int id_evaluare,Date data,int nr_evaluare)
-		{
-			Connection con=ConexiuneDB.conectare();		
-			try{
-				if(con!=null){
-				PreparedStatement stmt= con.prepareStatement("update evaluare set numar_evaluare=?, data_evaluare=?"+
-			" where id_evaluare=?");
-				stmt.setInt(1,nr_evaluare);
-				stmt.setDate(2,data);
-				stmt.setInt(3,id_evaluare);
-				System.out.println(stmt);
-				stmt.execute(); 
-				con.close();
-				}				
-			}
-			catch(SQLException e)
-			{
-				e.printStackTrace();
-			}	
-		}
-		
-		public static Evaluare returnEvaluare(int student_numar_matricol,int profesor_marca,int disciplina_id_disciplina){
-			
-			Connection con=ConexiuneDB.conectare();	
-			Evaluare evaluare= new Evaluare();
-			try{
-				if(con!=null){
-				PreparedStatement stmt= con.prepareStatement("select * from evaluare where student_numar_matricol=? and profesor_marca=? and disciplina_id_disciplina=?");
-				stmt.setInt(1, student_numar_matricol);
-				stmt.setInt(2, profesor_marca);
-				stmt.setInt(3, disciplina_id_disciplina);
-				ResultSet rs=stmt.executeQuery(); 
-				while(rs.next())  
-				{	
-					evaluare.setId_evaluare(rs.getInt("id_evaluare"));
-					evaluare.setProfesor_marca(rs.getInt("profesor_marca"));
-					evaluare.setStudent_numar_matricol(rs.getInt("student_numar_matricol"));
-					evaluare.setDisciplina_id_disciplina(rs.getInt("disciplina_id_disciplina"));
-					evaluare.setGrupa_id_grupa(rs.getInt("grupa_id_grupa"));
-					evaluare.setAn_universitar_id_an_universitar(rs.getInt("an_universitar_id_an_universitar"));
-					evaluare.setNumar_evaluare(rs.getInt("numar_evaluare"));
-					evaluare.setData(rs.getDate("data_evaluare"));
-				}
-				ConexiuneDB.closeResources(con, rs, stmt);
-				}				
-			}
-			catch(SQLException e)
-			{
-				e.printStackTrace();
-			}	
-			return evaluare;		
 		}
 		
 		public static Notare returnNotare(int student_numar_matricol,int profesor_marca,int disciplina_id_disciplina){
@@ -888,98 +691,6 @@ public class PrelucrariDB {
 			}	
 			return notare;		
 		}
-		
-		public static List<Notare> returnNotareStudent(int student_numar_matricol){
-			
-			Connection con=ConexiuneDB.conectare();	
-			List<Notare> listaNotare=new ArrayList<Notare>();
-			try{
-				if(con!=null){
-				PreparedStatement stmt= con.prepareStatement("select * from notare where student_numar_matricol=?");
-				stmt.setInt(1, student_numar_matricol);
-				ResultSet rs=stmt.executeQuery(); 
-				while(rs.next())  
-				{	
-					Notare notare= new Notare();
-					notare.setId_notare(rs.getInt("id_notare"));
-					notare.setData(rs.getDate("data"));
-					notare.setStudent_numar_matricol(rs.getInt("student_numar_matricol"));
-					notare.setProfesor_marca(rs.getInt("profesor_marca"));
-					notare.setDisciplina_id_disciplina(rs.getInt("disciplina_id_disciplina"));
-					notare.setNota(rs.getInt("nota"));
-					listaNotare.add(notare);
-				}
-				ConexiuneDB.closeResources(con, rs, stmt);
-				}				
-			}
-			catch(SQLException e)
-			{
-				e.printStackTrace();
-			}	
-			return listaNotare;		
-		}
-		
-		public static List<Disciplina> returnDisciplinaNotatStudent(int student_numar_matricol){
-			
-			Connection con=ConexiuneDB.conectare();	
-			List<Disciplina> listaDisciplineNotat=new ArrayList<Disciplina>();
-			try{
-				if(con!=null){
-				PreparedStatement stmt= con.prepareStatement("select * from notare join disciplina on "
-						+ "notare.disciplina_id_disciplina=disciplina.id_disciplina where notare.student_numar_matricol=? "
-						+ "group by disciplina.cod_disciplina");
-				stmt.setInt(1, student_numar_matricol);
-				ResultSet rs=stmt.executeQuery(); 
-				while(rs.next())  
-				{	
-					Disciplina disciplina=new Disciplina();
-					disciplina.setId_disciplina(rs.getInt("id_disciplina"));
-					disciplina.setCod_disciplina(rs.getInt("cod_disciplina"));
-					disciplina.setDenumire_disciplina(rs.getString("denumire_disciplina"));
-					disciplina.setTip_disciplina(rs.getString("tip_disciplina"));
-					listaDisciplineNotat.add(disciplina);
-				}
-				ConexiuneDB.closeResources(con, rs, stmt);
-				}				
-			}
-			catch(SQLException e)
-			{
-				e.printStackTrace();
-			}	
-			return listaDisciplineNotat;		
-		}
-		
-		public static Notare returnNotareDisciplina(int student_numar_matricol,int id_disciplina){
-			
-			Connection con=ConexiuneDB.conectare();	
-			Notare notare= new Notare();
-			try{
-				if(con!=null){
-				PreparedStatement stmt= con.prepareStatement("select * from student "
-						+ "join notare on student.numar_matricol=notare.student_numar_matricol "
-						+ "where notare.disciplina_id_disciplina=? and student.numar_matricol=?");
-				stmt.setInt(1, id_disciplina);
-				stmt.setInt(2, student_numar_matricol);
-				ResultSet rs=stmt.executeQuery(); 
-				while(rs.next())  
-				{	
-					notare.setId_notare(rs.getInt("id_notare"));
-					notare.setData(rs.getDate("data"));
-					notare.setStudent_numar_matricol(rs.getInt("student_numar_matricol"));
-					notare.setProfesor_marca(rs.getInt("profesor_marca"));
-					notare.setDisciplina_id_disciplina(rs.getInt("disciplina_id_disciplina"));
-					notare.setNota(rs.getInt("nota"));
-				}
-				ConexiuneDB.closeResources(con, rs, stmt);
-				}				
-			}
-			catch(SQLException e)
-			{
-				e.printStackTrace();
-			}	
-			return notare;		
-		}
-		
 		
 		public static List<Pondere> returnPondere(){
 			List<Pondere> listaPondere=new ArrayList<Pondere>();
@@ -1095,7 +806,7 @@ public class PrelucrariDB {
 			Connection con=ConexiuneDB.conectare();		
 			try{
 				if(con!=null){
-				PreparedStatement stmt= con.prepareStatement("select * from departament");
+				PreparedStatement stmt= con.prepareStatement("select * from departament order by denumire_departament");
 				ResultSet rs=stmt.executeQuery(); 
 				while(rs.next())  
 				{	
@@ -1196,47 +907,6 @@ public class PrelucrariDB {
 					return listaStudenti;
 				}
 				
-				public static List<Student> returnStudenti(int cod_specializare,int an_studiu,int id_disciplina,int marca_profesor)
-				{
-					List<Student> listaStudenti=new ArrayList<Student>();
-					Connection con=ConexiuneDB.conectare();		
-					try{
-						if(con!=null){
-						PreparedStatement stmt= con.prepareStatement("select * from preda "
-								+ "join grupa on preda.grupa_id_grupa=grupa.id_grupa "
-								+ "join student on student.grupa_id_grupa=grupa.id_grupa "
-								+ "where preda.disciplina_id_disciplina=? and grupa.an_studiu=? "
-								+ "and grupa.specializare_cod_specializare=? and preda.profesor_marca=? "
-								+ "group by student.numar_matricol");
-						stmt.setInt(1, id_disciplina);
-						stmt.setInt(2, an_studiu);
-						stmt.setInt(3, cod_specializare);
-						stmt.setInt(4, marca_profesor);
-						ResultSet rs=stmt.executeQuery();
-						while(rs.next())  
-						{	
-							Student student=new Student();
-							student.setNumar_matricol(Integer.parseInt(rs.getString("numar_matricol")));	
-							student.setCnp(rs.getString("cnp"));
-							student.setNume(rs.getString("nume"));
-							student.setPrenume(rs.getString("prenume"));
-							student.setForma_finantare(rs.getString("forma_finantare"));
-							student.setGrupa_id_grupa(rs.getInt("grupa_id_grupa"));
-							
-							listaStudenti.add(student);
-						}
-						ConexiuneDB.closeResources(con, rs, stmt);
-						}	
-						
-					}
-					catch(SQLException e)
-					{
-						e.printStackTrace();
-					}	
-					return listaStudenti;
-				}
-				
-				
 				public static List<Student> returnStudentiGrupa(int id_grupa)
 				{
 					List<Student> listaStudenti=new ArrayList<Student>();
@@ -1275,7 +945,6 @@ public class PrelucrariDB {
 						if(con!=null){
 						PreparedStatement stmt= con.prepareStatement("select * from student where cnp=?");
 						stmt.setString(1, cnp);
-						System.out.println(stmt);
 						ResultSet rs=stmt.executeQuery();
 						while(rs.next())  
 						{					
@@ -1286,7 +955,6 @@ public class PrelucrariDB {
 							student.setForma_finantare(rs.getString("forma_finantare"));
 							
 						}
-						System.out.println(student.getCnp());
 						ConexiuneDB.closeResources(con, rs, stmt);
 						}	
 						
@@ -1413,17 +1081,18 @@ public class PrelucrariDB {
 					}
 				}
 				//prelucrari specializari
-				public static void insertSpecializare(String denumire_specializare,String forma_invatamant)
+				public static void insertSpecializare(String denumire_specializare,String program_studii)
 				{
 					Connection con=ConexiuneDB.conectare();		
 					try{
 						if(con!=null){
-						PreparedStatement stmt= con.prepareStatement("insert into specializare (denumire_specializare,forma_invatamant) values (?,?)");
+						PreparedStatement stmt= con.prepareStatement("insert into specializare (denumire_specializare,program_studii) values (?,?)");
 						stmt.setString(1,denumire_specializare);
-						stmt.setString(2,forma_invatamant);
+						stmt.setString(2,program_studii);
 						stmt.executeUpdate();
 						con.close();
-						}				
+						}		
+						
 					}
 					catch(SQLException e)
 					{
@@ -1637,29 +1306,6 @@ public class PrelucrariDB {
 				return disciplina;		
 			}
 			
-			public static String returnTipDisciplina(int id_disciplina){
-				Connection con=ConexiuneDB.conectare();	
-				String tipDisciplina=null;
-				try{
-					if(con!=null){
-					PreparedStatement stmt= con.prepareStatement("select tip_disciplina from disciplina where id_disciplina=?");
-					stmt.setInt(1, id_disciplina);
-					System.out.println(stmt);
-					ResultSet rs=stmt.executeQuery(); 
-					while(rs.next())  
-					{	
-						tipDisciplina=rs.getString("tip_disciplina");
-					}
-					ConexiuneDB.closeResources(con, rs, stmt);
-					}				
-				}
-				catch(SQLException e)
-				{
-					e.printStackTrace();
-				}	
-				return tipDisciplina;		
-			}
-			
 			public static SortedSet<String> returnTipuriDisc(int cod_disciplina){
 				SortedSet<String> listaTipuriDisciplina=new TreeSet();
 				Connection con=ConexiuneDB.conectare();		
@@ -1705,32 +1351,6 @@ public class PrelucrariDB {
 			}
 			
 			
-			public static List<Disciplina> returnDisciplineCautate(String denumire_disciplina){
-				List<Disciplina> listaDiscipline=new ArrayList<Disciplina>();
-				Connection con=ConexiuneDB.conectare();		
-				try{
-					if(con!=null){
-					PreparedStatement stmt= con.prepareStatement("select * from disciplina where denumire_disciplina LIKE ?");
-					stmt.setString(1, "%"+denumire_disciplina+"%");
-					ResultSet rs=stmt.executeQuery(); 
-					while(rs.next())  
-					{	
-						Disciplina disciplina= new Disciplina();
-						disciplina.setId_disciplina(rs.getInt("id_disciplina"));
-						disciplina.setCod_disciplina(rs.getInt("cod_disciplina"));
-						disciplina.setDenumire_disciplina(rs.getString("denumire_disciplina"));
-						disciplina.setTip_disciplina(rs.getString("tip_disciplina"));
-						listaDiscipline.add(disciplina);					
-					}
-					ConexiuneDB.closeResources(con, rs, stmt);
-					}				
-				}
-				catch(SQLException e)
-				{
-					e.printStackTrace();
-				}	
-				return listaDiscipline;		
-			}
 			
 			public static List<Disciplina> returnDiscipline(String denumire_disciplina,String tip_disciplina){
 				List<Disciplina> listaDiscipline=new ArrayList<Disciplina>();
@@ -1846,7 +1466,7 @@ public class PrelucrariDB {
 				
 				try{
 					if(con!=null){
-					PreparedStatement stmt= con.prepareStatement("select * from profesor where departament_cod_departament=?");
+					PreparedStatement stmt= con.prepareStatement("select * from profesor where departament_cod_departament=? order by titulatura ASC,nume ASC");
 					stmt.setInt(1, cod_departament);
 					System.out.println(stmt.toString());
 					ResultSet rs=stmt.executeQuery(); 
@@ -1903,35 +1523,6 @@ public class PrelucrariDB {
 				return profesor;		
 			}
 			
-			public static Student returnStudentInfo(int nr_matricol){
-
-				Connection con=ConexiuneDB.conectare();
-				Student student=new Student();
-				
-				try{
-					if(con!=null){
-					PreparedStatement stmt= con.prepareStatement("select * from student where numar_matricol=?");
-					stmt.setInt(1, nr_matricol);
-					System.out.println(stmt.toString());
-					ResultSet rs=stmt.executeQuery(); 
-					while(rs.next())  
-					{	
-						student.setNumar_matricol(Integer.parseInt(rs.getString("numar_matricol")));
-						student.setCnp(rs.getString("cnp"));
-						student.setNume(rs.getString("nume"));
-						student.setPrenume(rs.getString("prenume"));
-						student.setForma_finantare(rs.getString("forma_finantare"));
-						student.setGrupa_id_grupa(Integer.parseInt(rs.getString("grupa_id_grupa")));
-					ConexiuneDB.closeResources(con, rs, stmt);
-					}	
-				}
-				}
-				catch(SQLException e)
-				{
-					e.printStackTrace();
-				}	
-				return student;		
-			}
 			
 			public static List<Profesor> returnProfesor(String titulatura,String departament){
 				List<Profesor> listaProfesori=new ArrayList<Profesor>();
