@@ -21,7 +21,7 @@
     <a href="studenti.jsp">Studenti</a>
     <a href="profesori.jsp">Profesori</a> 
     <a href="conturi.jsp">Conturi</a>
-    <a href="PaginaPrincipala.jsp">Delogare</a>
+    <a href="PaginaPrincipala.jsp">Deconectare</a>
     </div>
     
     <div class="continut" align="center">
