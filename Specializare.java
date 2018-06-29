@@ -4,7 +4,7 @@ public class Specializare {
 
 	private int cod_specializare;
 	private String denumire_specializare;
-	private String forma_invatamant;
+	private String program_studii;
 	public int getCod_specializare() {
 		return cod_specializare;
 	}
@@ -17,12 +17,11 @@ public class Specializare {
 	public void setDenumire_specializare(String denumire_specializare) {
 		this.denumire_specializare = denumire_specializare;
 	}
-	public String getForma_invatamant() {
-		return forma_invatamant;
+	public String getProgram_studii() {
+		return program_studii;
 	}
-	public void setForma_invatamant(String forma_invatamant) {
-		this.forma_invatamant = forma_invatamant;
+	public void setProgram_studii(String forma_invatamant) {
+		this.program_studii = forma_invatamant;
 	}
-	
 	
 }
