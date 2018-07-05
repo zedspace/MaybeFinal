@@ -35,20 +35,32 @@ public class UpdateServletGrupa extends HttpServlet {
 		// TODO Auto-generated method stub
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 		List<Grupa> listaGrupe=new ArrayList<Grupa>();
-		if(request.getParameter("specializare")!=null && request.getParameter("an_studiu")!=null)
+		//cautare filtrata a grupelor
+		if(request.getParameter("specializare")!=null && request.getParameter("specializare")!="" && request.getParameter("an_studiu_filtru")!=null && request.getParameter("an_studiu_filtru")!="")
 		{
-			System.out.println(Integer.parseInt(request.getParameter("specializare"))+" "+Integer.parseInt(request.getParameter("an_studiu")));
-			listaGrupe=PrelucrariDB.returnGrupe(Integer.parseInt(request.getParameter("specializare")), Integer.parseInt(request.getParameter("an_studiu")));
-			System.out.println("Grupe dupa filtrul "+Integer.parseInt(request.getParameter("specializare"))+" "+request.getParameter("an_studiu"));
-			request.setAttribute("listaRezultat", listaGrupe);
+			System.out.println(Integer.parseInt(request.getParameter("specializare"))+" "+Integer.parseInt(request.getParameter("an_studiu_filtru")));
+			listaGrupe=PrelucrariDB.returnGrupe(Integer.parseInt(request.getParameter("specializare")), Integer.parseInt(request.getParameter("an_studiu_filtru")));
+			if(!listaGrupe.isEmpty())
+			{
+				System.out.println("Grupe dupa filtrul "+Integer.parseInt(request.getParameter("specializare"))+" "+request.getParameter("an_studiu_filtru"));
+				request.setAttribute("listaRezultat", listaGrupe);
+			}
+			else
+				request.setAttribute("invalid", "Nu exista grupe de studenti in cadrul specializarii selectate!");
+			
 			
 			//response.sendRedirect("grupe.jsp");
 		}
-		if(request.getParameter("adaugaBtn")!=null)
+		if(request.getParameter("numar_grupa_add")!=null && request.getParameter("numar_grupa_add")!="" && request.getParameter("an_studiu_add")!=null && request.getParameter("an_studiu_add")!="" && request.getParameter("numar_studenti_add")!=null && request.getParameter("numar_studenti_add")!="")
 		{
 			PrelucrariDB.insertGrupa(request.getParameter("numar_grupa_add"), request.getParameter("an_studiu_add"), request.getParameter("numar_studenti_add"), request.getParameter("specializare_add"));
-			request.setAttribute("succes", "Grupa a fost inserata cu succes!");
+			request.setAttribute("succes", "Grupa "+request.getParameter("numar_grupa_add")+ " a fost inserata cu succes!");
 			System.out.println("S-a inserat grupa "+request.getParameter("numar_grupa_add")+" "+request.getParameter("an_studiu_add")+" "+request.getParameter("numar_studenti_add")+" "+request.getParameter("specializare_add"));
+		}
+		else
+		{
+			request.setAttribute("invalid", "Toate campurile sunt obligatorii!");
+
 		}
 		request.getRequestDispatcher("grupe.jsp").forward(request,response);
 	}
