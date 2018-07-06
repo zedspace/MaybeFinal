@@ -92,7 +92,7 @@ public class PrelucrariDB {
 			Specializare specializare=new Specializare();
 			try{
 				if(con!=null){
-				PreparedStatement stmt= con.prepareStatement("select * from specializare where cod_specializare=?");
+				PreparedStatement stmt= con.prepareStatement("select * from specializare where cod_specializare=? order by denumire_specializare");
 				stmt.setInt(1, cod_Specializare);
 				ResultSet rs=stmt.executeQuery();
 				while(rs.next())  
@@ -278,6 +278,33 @@ public class PrelucrariDB {
 			return listaGrupe;		
 		}
 
+		public static List<Grupa> returnGrupeSpec(){
+			List<Grupa> listaGrupe=new ArrayList<Grupa>();
+			Connection con=ConexiuneDB.conectare();		
+			try{
+				if(con!=null){
+				PreparedStatement stmt= con.prepareStatement("select * from grupa join specializare on grupa.specializare_cod_specializare=specializare.cod_specializare order by denumire_specializare");
+				ResultSet rs=stmt.executeQuery();
+				while(rs.next())  
+				{	
+					Grupa grupa=new Grupa();
+					grupa.setId_grupa(rs.getInt("id_grupa"));
+					grupa.setNumar_grupa(rs.getInt("numar_grupa"));
+					grupa.setAn_studiu(rs.getInt("an_studiu"));
+					grupa.setNumar_studenti(rs.getInt("numar_studenti"));
+					grupa.setSpecializare_cod_specializare(rs.getInt("specializare_cod_specializare"));				
+					listaGrupe.add(grupa);			
+				}
+				ConexiuneDB.closeResources(con, rs, stmt);
+				}				
+			}
+			catch(SQLException e)
+			{
+				e.printStackTrace();
+			}	
+			return listaGrupe;		
+		}
+		
 		public static Grupa returnGrupa(int id_grupa){
 			Grupa grupa=new Grupa();
 			Connection con=ConexiuneDB.conectare();		
@@ -343,7 +370,7 @@ public class PrelucrariDB {
 			Connection con=ConexiuneDB.conectare();		
 			try{
 				if(con!=null){
-				PreparedStatement stmt= con.prepareStatement("select * from disciplina");
+				PreparedStatement stmt= con.prepareStatement("select * from disciplina order by denumire_disciplina");
 				ResultSet rs=stmt.executeQuery(); 
 				while(rs.next())  
 				{	
@@ -411,7 +438,7 @@ public class PrelucrariDB {
 			Connection con=ConexiuneDB.conectare();		
 			try{
 				if(con!=null){
-				PreparedStatement stmt= con.prepareStatement("select * from preda");
+				PreparedStatement stmt= con.prepareStatement("select * from preda join disciplina on disciplina.id_disciplina=preda.disciplina_id_disciplina order by disciplina.denumire_disciplina");
 				ResultSet rs=stmt.executeQuery(); 
 				while(rs.next())  
 				{	
@@ -1305,6 +1332,33 @@ public class PrelucrariDB {
 				}	
 				return disciplina;		
 			}
+			
+			public static List<Disciplina> returnDisciplineCautate(String denumire_disciplina){
+				List<Disciplina> listaDiscipline=new ArrayList<Disciplina>();
+		 		Connection con=ConexiuneDB.conectare();		
+		 			try{
+		 				if(con!=null){
+		 				PreparedStatement stmt= con.prepareStatement("select * from disciplina where denumire_disciplina LIKE ? order by denumire_disciplina");
+						stmt.setString(1, "%"+denumire_disciplina+"%");
+		 				ResultSet rs=stmt.executeQuery(); 
+		 				while(rs.next())  
+		 				{	
+		 					Disciplina disciplina= new Disciplina();
+		 					disciplina.setId_disciplina(rs.getInt("id_disciplina"));
+		 					disciplina.setCod_disciplina(rs.getInt("cod_disciplina"));
+		 					disciplina.setDenumire_disciplina(rs.getString("denumire_disciplina"));
+		 					disciplina.setTip_disciplina(rs.getString("tip_disciplina"));
+		 					listaDiscipline.add(disciplina);					
+						}
+					ConexiuneDB.closeResources(con, rs, stmt);
+					}				
+			}
+			catch(SQLException e)
+			{
+				e.printStackTrace();
+			}	
+			return listaDiscipline;		
+		 	}
 			
 			public static SortedSet<String> returnTipuriDisc(int cod_disciplina){
 				SortedSet<String> listaTipuriDisciplina=new TreeSet();
