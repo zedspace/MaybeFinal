@@ -1333,6 +1333,32 @@ public class PrelucrariDB {
 				return disciplina;		
 			}
 			
+			public static Disciplina returnDisciplina(String denumire_disciplina){
+				Disciplina disciplina=new Disciplina();
+				Connection con=ConexiuneDB.conectare();		
+				try{
+					if(con!=null){
+					PreparedStatement stmt= con.prepareStatement("select * from disciplina where denumire_disciplina=? group by cod_disciplina");
+					stmt.setString(1, denumire_disciplina);
+					System.out.println(stmt);
+					ResultSet rs=stmt.executeQuery(); 
+					while(rs.next())  
+					{	
+						disciplina.setId_disciplina(rs.getInt("id_disciplina"));
+						disciplina.setCod_disciplina(rs.getInt("cod_disciplina"));
+						disciplina.setDenumire_disciplina(rs.getString("denumire_disciplina"));
+						disciplina.setTip_disciplina(rs.getString("tip_disciplina"));
+					}
+					ConexiuneDB.closeResources(con, rs, stmt);
+					}				
+				}
+				catch(SQLException e)
+				{
+					e.printStackTrace();
+				}	
+				return disciplina;		
+			}
+			
 			public static List<Disciplina> returnDisciplineCautate(String denumire_disciplina){
 				List<Disciplina> listaDiscipline=new ArrayList<Disciplina>();
 		 		Connection con=ConexiuneDB.conectare();		
@@ -1459,7 +1485,30 @@ public class PrelucrariDB {
 				return idDisciplina;		
 			}
 			
-			public static void insertDisciplina(String denumire,String tip_disciplina,String cod_diciplina)
+			public static int returnMaxCodDisc(){
+				Connection con=ConexiuneDB.conectare();	
+				int codDisciplina=0;
+				try{
+					if(con!=null){
+					PreparedStatement stmt= con.prepareStatement("select max(cod_disciplina) from disciplina");
+					System.out.println(stmt);
+					ResultSet rs=stmt.executeQuery(); 
+					while(rs.next())  
+					{	
+						codDisciplina=rs.getInt("max(cod_disciplina)");						
+					}
+					ConexiuneDB.closeResources(con, rs, stmt);
+					}				
+				}
+				catch(SQLException e)
+				{
+					e.printStackTrace();
+				}	
+				return codDisciplina;		
+			}
+			
+			
+			public static void insertDisciplina(String denumire,String tip_disciplina,int cod_diciplina)
 			{
 				Connection con=ConexiuneDB.conectare();		
 				try{
@@ -1467,7 +1516,7 @@ public class PrelucrariDB {
 					PreparedStatement stmt= con.prepareStatement("insert into disciplina (denumire_disciplina,tip_disciplina,cod_disciplina) values (?,?,?)");
 					stmt.setString(1,denumire);
 					stmt.setString(2,tip_disciplina);
-					stmt.setString(3,cod_diciplina);
+					stmt.setInt(3,cod_diciplina);
 					System.out.println(stmt);
 					stmt.executeUpdate();
 					con.close();
@@ -1479,6 +1528,7 @@ public class PrelucrariDB {
 					System.out.println("Profesorul nu a putut fi inserat");
 				}
 			}
+			
 			
 			
 			public static List<Profesor> returnProfesor(String nume){

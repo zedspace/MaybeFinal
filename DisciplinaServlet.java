@@ -40,6 +40,7 @@ public class DisciplinaServlet extends HttpServlet {
 		if(request.getParameter("vizualizare")!=null)
 			request.setAttribute("listaPredare", listaPreda);
 		List<Disciplina> listaDiscipline=new ArrayList<Disciplina>();
+		List<Disciplina> listaDisciplineCautate=new ArrayList<Disciplina>();
 		List<Disciplina> listaCompletaDisc=new ArrayList<Disciplina>();
 		List<Disciplina> disciplinaPreda=new ArrayList<Disciplina>();
 		if(request.getParameter("vizualizare")!=null)
@@ -61,6 +62,7 @@ public class DisciplinaServlet extends HttpServlet {
 			int id_grupa=0;
 			int id_disciplina=0;
 			int id_preda=0;
+			int cod_disciplina=0;
 			if(request.getParameter("den_disc")!=null&&request.getParameter("den_disc")!=""&&request.getParameter("an_studiu")!=null&&request.getParameter("semestrul")!=null&&request.getParameter("tip_disc")!=null)
 				{
 					System.out.println("Adaugarea disciplinei se face cu: "
@@ -69,26 +71,39 @@ public class DisciplinaServlet extends HttpServlet {
 											+" Semestrul "+request.getParameter("semestrul")
 											+" Tipul disciplinei "+request.getParameter("tip_disc")
 											+" Numarul de credite pentru curs: "+request.getParameter("credite"));
+					//verificare disciplina existenta
 					listaDiscipline=PrelucrariDB.returnDiscipline(request.getParameter("den_disc"), request.getParameter("tip_disc"));
 					if(!listaDiscipline.isEmpty())
 						{
 							request.setAttribute("notFound", "Disciplina nu poate fi adaugata! Exista deja!");
 							System.out.println("Disciplina inserata exista deja");
 						}
+					//inserarea disciplinei
 					else
 					{
 						System.out.println("--Se insereaza disciplina--");
-						PrelucrariDB.insertDisciplina(request.getParameter("den_disc"), request.getParameter("tip_disc"), "0");
-						request.setAttribute("succes", "Disciplina "+request.getParameter("den_disc")+ " a fost inserata cu succes!");
+						cod_disciplina=PrelucrariDB.returnDisciplina(request.getParameter("den_disc")).getCod_disciplina();
+						if(cod_disciplina!=0)
+						{
+							System.out.println(cod_disciplina);
+							PrelucrariDB.insertDisciplina(request.getParameter("den_disc"), request.getParameter("tip_disc"), cod_disciplina);
+						}
+						else
+						{
+							System.out.println(PrelucrariDB.returnMaxCodDisc());
+							PrelucrariDB.insertDisciplina(request.getParameter("den_disc"), request.getParameter("tip_disc"), PrelucrariDB.returnMaxCodDisc()+1);
+						}
+						
+						request.setAttribute("succes", "Disciplina "+request.getParameter("den_disc")+" de tipul "+ request.getParameter("tip_disc") + " a fost inserata cu succes!");
 						disciplinaPreda=PrelucrariDB.returnDiscipline(request.getParameter("den_disc"), request.getParameter("tip_disc"));
 						for(Disciplina disc:disciplinaPreda)
 							id_disciplina=disc.getId_disciplina();
-						System.out.println("Disciplina inserata are codul: "+id_disciplina);
+						System.out.println("Disciplina inserata are id-ul: "+id_disciplina);
 						listaGrupa=PrelucrariDB.returnGrupe(Integer.parseInt(request.getParameter("specializare")), Integer.parseInt(request.getParameter("an_studiu")));
 						for(Grupa grupa:listaGrupa)
 						{
 							id_grupa=grupa.getId_grupa();
-							System.out.println("Grupa pentru care se aloca profesorul are codul: "+id_grupa);
+							System.out.println("Grupa pentru care se aloca profesorul are id-ul: "+id_grupa);
 							//insereaza pentru anul in curs
 							System.out.println("Semestrul:"+request.getParameter("semestrul"));
 							if(Integer.parseInt(request.getParameter("semestrul"))==1)
@@ -133,6 +148,10 @@ public class DisciplinaServlet extends HttpServlet {
 									}
 							}
 						}
+						else
+						{
+							request.setAttribute("invalid", "Pentru o disciplina de tip CURS trebuie specificat numarul de credite!");
+						}
 					}
 					
 				}
@@ -144,10 +163,10 @@ public class DisciplinaServlet extends HttpServlet {
 			//listaDiscipline=PrelucrariDB.returnDiscipline(request.getParameter("tipDisciplina"));
 			if(request.getParameter("disciplina_cautata")!=null)
 			{
-				listaDiscipline=PrelucrariDB.returnDisciplineCautate(request.getParameter("disciplina_cautata"));
-				request.setAttribute("listaDiscipline", listaDiscipline);
+				listaDisciplineCautate=PrelucrariDB.returnDisciplineCautate(request.getParameter("disciplina_cautata"));
+				request.setAttribute("listaDisciplineCautate", listaDisciplineCautate);
 			}
-			if(listaDiscipline.isEmpty())
+			if(listaDisciplineCautate.isEmpty())
 				request.setAttribute("notFound", "Nu exista discipline care sa corespunda criteriilor de cautare!");
 		}
 //		if(request.getParameter("cauta")==null)

@@ -39,6 +39,13 @@
 		</div>
 	<%}%>
 	
+	<%if(request.getAttribute("invalid")!=null){ %>
+	    <div class="alert">
+			<span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+		    <strong><%=request.getAttribute("invalid")%></strong>
+		</div>
+	<%}%>
+	
     <form id="form" name="form" method="post"  action="DisciplinaServlet">
     <fieldset style="width: 800px;">
  		<legend>Cautare - Discipline</legend>
@@ -46,17 +53,26 @@
     	<tr>
     		<td style="font-size:20px;"><b>Cauta disciplina</b></td>
 			<td><input type="text" name="disciplina_cautata" id="disciplina_cautata"/></td>
-    		<td><button type="submit" name="cauta" id="cauta" style="font-size:20px;" onclick="hidefunction()">Cauta disciplina</button></td>
+    		<td><button type="submit" name="cauta" id="cauta" style="font-size:20px;">Cauta disciplina</button></td>
     		<td><button type="submit" name="vizualizare" id="vizualizare" style="font-size:20px;">Vezi toate disciplinele</button></td>
     		<td><br><br><br></td>	
     	</tr>
     	</table>	
    	 </fieldset>
     
+     <fieldset style="width: 800px;">
+		<legend>Adaugare - Discipline</legend>
+ 		<table>
+   		<tr>
+   			<td style="font-size:20px;"><b>Adauga o noua disciplina</b></td>
+   			<td><button type="button" name="adaugareDiscForm" id="adaugareDiscForm" style="font-size:20px;" onclick="showFunction()">Adaugare</button></td>
+   		</tr>
+   		</table>	
+   	 </fieldset>
+    
     <div id="toateDisciplinele">
    	<%List<Preda>listaPredare=(ArrayList<Preda>)request.getAttribute("listaPredare"); %>
    	<%if(listaPredare!=null){%>
-   	
    	<fieldset style="width: 800px;">
 		<legend>Toate disciplinele</legend>
 		<%List<AfisarePredare> predareProfesori=PrelucrariDB.afisarePredare(listaPredare); %>
@@ -84,31 +100,34 @@
 		</fieldset>
     </div>
     	
-   	<%	List<Disciplina> listaDiscipline=new ArrayList<Disciplina>();
-   		if(request.getAttribute("listaDiscipline")!=null)
+    <div id="rezultateCautare">
+   	<%	List<Disciplina> listaDisciplineCautate=new ArrayList<Disciplina>();
+   		if(request.getAttribute("listaDisciplineCautate")!=null)
    			{
-   				listaDiscipline=(ArrayList<Disciplina>)request.getAttribute("listaDiscipline"); 
-   	%> 
-   	<fieldset style="width: 800px;">
-		<legend>Rezultat - Discipline cautate</legend>
-	   	<table>
-	   	<tr>
-	   		<td style="font-size:20px;"><b>Denumire Disciplina</b></td>
-	   		<td style="font-size:20px;"><b>Tip disciplina</b></td>
-	   	</tr>
-	   	<tr>
-	   	<%for(Disciplina disciplina: listaDiscipline){ %>
-				<input type="hidden" name="id_disciplina" id="id_disciplina" value="<%=disciplina.getId_disciplina() %>" />
-				<input type="hidden" name="cod_disciplina" id="cod_disciplina" value="<%=disciplina.getCod_disciplina() %>"/>   
-				<td><input type="text" name="denumire_disciplina" id="denumire_disciplina" value="<%=disciplina.getDenumire_disciplina() %>" disabled size="30" style="font-size:20px;"/></td>
-				<td><input type="text" name="tip_disciplina" id="tip_disciplina" value="<%=disciplina.getTip_disciplina() %>" disabled size="10" style="font-size:20px;"/></td>
-	   	</tr>
-	   	<%}};%>
+   				listaDisciplineCautate=(ArrayList<Disciplina>)request.getAttribute("listaDisciplineCautate"); 
+   				if(!listaDisciplineCautate.isEmpty()){	%> 
+   				<fieldset style="width: 800px;">
+				<legend>Rezultat - Discipline cautate</legend>
+			   	<table>
+			   	<tr>
+			   		<td style="font-size:20px;"><b>Denumire Disciplina</b></td>
+			   		<td style="font-size:20px;"><b>Tip disciplina</b></td>
+			   	</tr>
+			   	<tr>
+			   	<%for(Disciplina disciplina: listaDisciplineCautate){ %>
+						<input type="hidden" name="id_disciplina" id="id_disciplina" value="<%=disciplina.getId_disciplina() %>" />
+						<input type="hidden" name="cod_disciplina" id="cod_disciplina" value="<%=disciplina.getCod_disciplina() %>"/>   
+						<td><input type="text" name="denumire_disciplina" id="denumire_disciplina" value="<%=disciplina.getDenumire_disciplina() %>" disabled size="30" style="font-size:20px;"/></td>
+						<td><input type="text" name="tip_disciplina" id="tip_disciplina" value="<%=disciplina.getTip_disciplina() %>" disabled size="10" style="font-size:20px;"/></td>
+			   	</tr>
+	   	<%}}};%>
 	   </table>
  	</fieldset>
+    </div>	
     
-    <div id="adaugareDiscipinaPas1">
-	<fieldset style="width: 800px;">
+
+    <div id="adaugareDiscipinaPas1" style="display: none;">
+	<fieldset style="width: 800px;" id="fieldsetAdaugarePas1">
  		<legend>Adauga o disciplina pentru anul in curs</legend>
    		<table id="adaugareDisc" width="100%" align="center">
     	<tr>
@@ -134,16 +153,16 @@
     	<tr>
     		<td style="font-size:20px;">Selecteaza anul de studiu</td>
     		<td>
-				<input type="radio" id="an_studiu" name="an_studiu" value="1"><label style="font-size:20px;">1</label>
-				<input type="radio" id="an_studiu" name="an_studiu" value="2"><label style="font-size:20px;">2</label>
-				<input type="radio" id="an_studiu" name="an_studiu" value="3"><label style="font-size:20px;">3</label>
+				<input type="radio" id="an_studiu1" name="an_studiu" value="1"><label style="font-size:20px;">1</label>
+				<input type="radio" id="an_studiu2" name="an_studiu" value="2"><label style="font-size:20px;">2</label>
+				<input type="radio" id="an_studiu3" name="an_studiu" value="3"><label style="font-size:20px;">3</label>
 			</td>
     	</tr>
     	<tr>
     		<td style="font-size:20px;">Selecteaza semestrul</td>
     		<td>
-				<input type="radio" id="semestrul" name="semestrul" value="1"><label style="font-size:20px;">I</label>
-				<input type="radio" id="semestrul" name="semestrul" value="2"><label style="font-size:20px;">II</label>
+				<input type="radio" id="semestrul1" name="semestrul" value="1"><label style="font-size:20px;">I</label>
+				<input type="radio" id="semestrul2" name="semestrul" value="2"><label style="font-size:20px;">II</label>
 			</td>
     	</tr>
     	<tr>
@@ -167,7 +186,7 @@
     		<table align="center" width="100%">
 				<tr>
 					<td style="font-size:20px;">Introdu numarul de credite</td>
-					<td style="font-size:20px;"><input type="text" name="credite" id="credite" size=23 style="font-size:20px;" placeholder="Doar pentru CURS" disabled/></td>
+					<td style="font-size:20px;"><input type="text" name="credite" id="credite" size=23 style="font-size:20px;"  title="Numarul de credite poate fi completat doar pentru disciplina de tip CURS." disabled/></td>
 				</tr>
 					<tr>
 	    			<td style="font-size:20px;">Selecteaza titularul disciplinei</td>
@@ -187,25 +206,46 @@
 		</fieldset>
     </div>
 </form>
+<!-- <input type="hidden" id="hid_den_disc" name="hid_den_disc"> -->
+<!-- <input type="hidden" id="hid_specializare" name="hid_specializare"> -->
+<!-- <input type="hidden" id="hid_semestrul" name="hid_semestrul"> -->
+<!-- <input type="hidden" id="hid_tip_disc" name="hid_tip_disc"> -->
 </div>
 </div>   
 <script>
 function showFunctionAdd() {
 	    var x = document.getElementById("adaugareDisciplina");
 // 	    document.getElementById("adaugareDisc").disabled = true;
-	    if (x.style.display === "none") {
-	        x.style.display = "block";
-	    }
-	    if (document.getElementById("curs").checked) {
-	    	  disc = document.getElementById("curs").value;
-	    	  document.getElementById("tip").value=disc;
-	    	  document.getElementById("credite").disabled = false;
-	    }   
-	}
- function hidefunction()
- {
-	 document.getElementById("adaugareDiscipinaPas1").style.display = "none";
- }
+//		document.getElementById("hid_den_disc").value = document.getElementById("den_disc").value;
+		if(document.getElementById("den_disc").value!=null && document.getElementById("den_disc").value!=""  && (document.getElementById("an_studiu1").checked==true || document.getElementById("an_studiu2").checked==true || document.getElementById("an_studiu3").checked==true) && (document.getElementById("semestrul1").checked==true || document.getElementById("semestrul2").checked==true) && (document.getElementById("curs").checked==true || document.getElementById("seminar").checked==true || document.getElementById("laborator").checked==true || document.getElementById("proiect").checked==true))
+	    {
+//			document.getElementById("fieldsetAdaugarePas1").disabled = true;
+			if (x.style.display === "none") {
+		        x.style.display = "block";
+		    }
+		    if (document.getElementById("curs").checked) {
+		    	  disc = document.getElementById("curs").value;
+		    	  document.getElementById("tip").value=disc;
+		    	  document.getElementById("credite").disabled = false;
+		    }  
+		}
+		else
+		{
+			alert("Toate campurile sunt obligatorii!");	
+		}
+
+}
+function showFunction()
+{
+	var x = document.getElementById("adaugareDiscipinaPas1");
+	var y = document.getElementById("toateDisciplinele");
+	var z = document.getElementById("rezultateCautare");
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    }
+    y.style.display = "none";
+    z.style.display = "none";
+}
 </script>
 </body>
 </html>
