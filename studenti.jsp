@@ -6,9 +6,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<link rel="stylesheet" type="text/css" href="css/adminStyle.css">
-<title>Administrator</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<link rel="stylesheet" type="text/css" href="css/adminStyle.css">
+	<title>Administrator - Studenti</title>
 </head>
 <body>
 <div class="wrap">
@@ -51,6 +51,31 @@
 		    <strong><%=request.getAttribute("succes")%></strong>
 		</div>
 	<%}%>
+	
+	<fieldset>
+ 		<legend>Vizualizarea studentilor</legend>
+ 			<table>
+ 			<tr>
+ 				<td>Selecteaza specializarea</td>
+ 				<td><button type="button" name="vizualizareStudentiSpec" id="vizualizareStudentiSpec" onclick="" style="font-size:20px;">Vizualizarea studentilor apartinand specializarii</button></td>
+ 			</tr>
+ 			<tr>
+				<td><%List<Specializare> listaSpecializari= PrelucrariDB.returnSpecializari(); %>
+					<select name="specializare" id="specializare" style="font-size:20px;">
+					<%for(Specializare specializare: listaSpecializari){ %>
+					<option value = "<%=specializare.getCod_specializare()%>"> 
+					<%=(specializare.getDenumire_specializare())%> &rarr; <%=(specializare.getProgram_studii())%>
+					</option>
+					<%}%>
+					</select>
+				</td>
+				<td><button type="button" name="vizualizareStudenti" id="vizualizareStudenti" onclick="showFunctionAdd('listaCompletaStud')" style="font-size:20px;">Vizualizarea listei complete a studentilor</button></td>
+			</tr>
+			</table>
+	</fieldset>
+	
+	
+	<div id="listaCompletaStud" name="listaCompletaStud" style="display: none;">
 	<fieldset>
  		<legend>Lista completa a studentilor</legend>
     <table>
@@ -73,11 +98,11 @@
     	<%}%>
     	</table>
     	</fieldset>
-    	
+    	</div>
     	
     	<table align="left">
 	    	<tr>
-	    		<td><button type="button" name="adaugaStudent" onclick="showFunctionAdd()" style="font-size:20px;">Adauga un student</button></td>
+	    		<td><button type="button" name="adaugaStudent" onclick="showFunctionAdd('adaugareStudent')" style="font-size:20px;">Adauga un student</button></td>
 	    	</tr>
     	</table>
     	<br><br><br>
@@ -147,13 +172,11 @@
 </div>  
 </div>
 <script>
-function showFunctionAdd() {
-    var x = document.getElementById("adaugareStudent");
+function showFunctionAdd(camp) {
+    var x = document.getElementById(camp);
     if (x.style.display === "none") {
         x.style.display = "block";
-    } else {
-        x.style.display = "none";
-    }
+    } 
 }
 </script>
 </body>
