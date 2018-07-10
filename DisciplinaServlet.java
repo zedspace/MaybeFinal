@@ -49,7 +49,7 @@ public class DisciplinaServlet extends HttpServlet {
 				request.setAttribute("listaCompletaDisc", listaCompletaDisc);
 				
 			}
-		if(request.getParameter("adaugaFinal")!=null){
+		if(request.getParameter("den_disc")!=null && request.getParameter("den_disc")!=""){
 		
 			System.out.println("Se incearca adaugarea disciplinei cu: "
 					+" Denumire: "+request.getParameter("den_disc")
@@ -63,7 +63,7 @@ public class DisciplinaServlet extends HttpServlet {
 			int id_disciplina=0;
 			int id_preda=0;
 			int cod_disciplina=0;
-			if(request.getParameter("den_disc")!=null&&request.getParameter("den_disc")!=""&&request.getParameter("an_studiu")!=null&&request.getParameter("semestrul")!=null&&request.getParameter("tip_disc")!=null)
+			if(request.getParameter("den_disc")!=null&&request.getParameter("den_disc")!=""&&request.getParameter("an_studiu")!=null&&request.getParameter("semestrul")!=null&&request.getParameter("tip_disc")!=null && ( (request.getParameter("tip_disc").equals("curs")&&request.getParameter("credite")!=null&&request.getParameter("credite")!="") || !request.getParameter("tip_disc").equals("curs") ))
 				{
 					System.out.println("Adaugarea disciplinei se face cu: "
 											+" Denumire: "+request.getParameter("den_disc")

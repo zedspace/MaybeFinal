@@ -201,7 +201,7 @@
 					</td>
 				</tr>
 				<tr><td colspan="2"><input type="hidden" name="tip" id="tip"/></td></tr>
-				<tr><td colspan="2" align="center"><button type="submit" name="adaugaFinal" id="adaugaFinal" style="font-size:20px;">Finalizeaza adaugarea disciplinei</button></td></tr>
+				<tr><td colspan="2" align="center"><button type="button" name="adaugaFinal" id="adaugaFinal" style="font-size:20px;" onclick="verificareCamp()">Finalizeaza adaugarea disciplinei</button></td></tr>
 			</table>
 		</fieldset>
     </div>
@@ -245,6 +245,14 @@ function showFunction()
     }
     y.style.display = "none";
     z.style.display = "none";
+}
+function verificareCamp()
+{
+	if(document.getElementById("credite").disabled == false)
+		if(document.getElementById("credite").value==null || document.getElementById("credite").value=="")
+			alert("Pentru disciplina de tip CURS este necesara introducerea numarului de credite!");
+		else
+			document.form.submit();
 }
 </script>
 </body>
