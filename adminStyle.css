@@ -70,6 +70,7 @@ div a:hover +div {
     .sidenav a {font-size: 18px;}
 }
 fieldset {
+  max-width: auto; 
   margin: 20px;
   padding: 0 10px 10px;
   border: 1px solid orange;
@@ -121,6 +122,7 @@ input[type=text] {
     color: white;
     font-size:20px;
 }
+
 .closebtn {
     margin-left: 15px;
     color: white;
@@ -131,6 +133,7 @@ input[type=text] {
     cursor: pointer;
     transition: 0.3s;
 }
+
 .closebtn:hover {
     color: black;
 }

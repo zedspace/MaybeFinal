@@ -36,6 +36,7 @@ public class StudentServlet extends HttpServlet {
 		// TODO Auto-generated method stub
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 		List<Student> studenti= new ArrayList<Student>();
+		List<Student> studentiSpecializare=new ArrayList<Student>();
 		if(request.getParameter("cauta")!=null)
 		{
 			System.out.println("Se cauta studentul "+request.getParameter("nume"));
@@ -66,8 +67,24 @@ public class StudentServlet extends HttpServlet {
 			}
 			else
 				request.setAttribute("incomplet", "Toate campurile sunt obligatorii");
-			request.getRequestDispatcher("studenti.jsp").forward(request,response);
+			
 		}
+		if(request.getParameter("vizualizareStudentiSpec")!=null)
+		{
+			if(request.getParameter("specializare")!=null)
+			{
+				studentiSpecializare=PrelucrariDB.returnStudentiSpecializare(Integer.parseInt(request.getParameter("specializare")));
+				if(studentiSpecializare.isEmpty())
+					request.setAttribute("invalid", "Nu exista stundenti inregistrati in cadrul specializarii selectate");
+				else
+					{
+						request.setAttribute("studentiSpecializare", studentiSpecializare);
+						request.setAttribute("specializareSelectata", PrelucrariDB.returnSpecializare(Integer.parseInt(request.getParameter("specializare"))).getDenumire_specializare()+" "+PrelucrariDB.returnSpecializare(Integer.parseInt(request.getParameter("specializare"))).getProgram_studii());
+					}
+			}
+		}
+		request.getRequestDispatcher("studenti.jsp").forward(request,response);
+		
 		
 	}
 

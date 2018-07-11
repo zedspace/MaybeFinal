@@ -21,12 +21,12 @@
     <a class="active" href="studenti.jsp">Studenti</a>
     <a href="profesori.jsp">Profesori</a> 
     <a href="conturi.jsp">Conturi</a>
-    <a href="PaginaPrincipala.jsp">Delogare</a>
+    <a href="PaginaPrincipala.jsp">Deconectare</a>
     </div>
+    
     <div class="continut" align="center">
     <h2>Studenti</h2>
     <form name="form" action="StudentServlet">
-    
     <%if(request.getAttribute("notFound")!=null){ %>
 	    <div class="alert">
 			<span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
@@ -51,13 +51,19 @@
 		    <strong><%=request.getAttribute("succes")%></strong>
 		</div>
 	<%}%>
+		<%if(request.getAttribute("invalid")!=null){ %>
+	    <div class="alert">
+			<span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+		    <strong><%=request.getAttribute("invalid")%></strong>
+		</div>
+	<%}%>
 	
 	<fieldset>
  		<legend>Vizualizarea studentilor</legend>
  			<table>
  			<tr>
- 				<td>Selecteaza specializarea</td>
- 				<td><button type="button" name="vizualizareStudentiSpec" id="vizualizareStudentiSpec" onclick="" style="font-size:20px;">Vizualizarea studentilor apartinand specializarii</button></td>
+ 				<td><b>Selecteaza specializarea</b></td>
+ 				<td><button type="button" name="vizualizareStudenti" id="vizualizareStudenti" onclick="showFunctionAdd('listaCompletaStud','studentiDeLaSpecializare')" style="font-size:20px;">Vizualizare studenti</button></td>
  			</tr>
  			<tr>
 				<td><%List<Specializare> listaSpecializari= PrelucrariDB.returnSpecializari(); %>
@@ -69,31 +75,66 @@
 					<%}%>
 					</select>
 				</td>
-				<td><button type="button" name="vizualizareStudenti" id="vizualizareStudenti" onclick="showFunctionAdd('listaCompletaStud')" style="font-size:20px;">Vizualizarea listei complete a studentilor</button></td>
+				<td><button type="submit" name="vizualizareStudentiSpec" id="vizualizareStudentiSpec" onclick="" style="font-size:20px;">Vizualizare filtrata studenti</button></td>
 			</tr>
 			</table>
 	</fieldset>
 	
+	
+	<div id="studentiDeLaSpecializare" name="studentiDeLaSpecializare">
+	<%if(request.getAttribute("studentiSpecializare")!=null){ %>
+	<fieldset>
+ 		<legend>Studentii inregistrati la specializarea <%=request.getAttribute("specializareSelectata") %>:</legend>
+    <table>
+    	<tr>
+    		<td><b>Numar Matricol</b></td>
+<!--     		<td><b>CNP</b></td> -->
+    		<td><b>Nume</b></td>
+    		<td><b>Prenume</b></td>
+    		<td><b>Specializarea</b></td>
+    		<td><b>Program de studii</b></td>
+    		<td><b>Forma de Finantare</b></td>
+    	</tr>
+    	<tr>
+    	<%List<Student> studentiSpecializare=(List<Student>)request.getAttribute("studentiSpecializare"); %>
+    	<%for(Student student: studentiSpecializare){ %>
+ 			<td><input type="text" value="<%=student.getNumar_matricol() %>" disabled size=5/></td>
+<%--  			<td><input type="text" value="<%=student.getCnp() %>" disabled size=13/></td>    --%>
+ 			<td><input type="text" value="<%=student.getNume() %>" disabled size=15/></td>
+ 			<td><input type="text" value="<%=student.getPrenume() %>" disabled size=20/></td>
+ 			<td><input type="text" value="<%=PrelucrariDB.returnSpecializareaStudentului(student.getNumar_matricol()).getDenumire_specializare()%>" disabled size=20/></td>
+ 			<td><input type="text" value="<%=PrelucrariDB.returnSpecializareaStudentului(student.getNumar_matricol()).getProgram_studii()%>" disabled size=20/></td>
+ 			<td><input type="text" value="<%=student.getForma_finantare() %>" disabled size=5/></td>
+    	</tr>
+    	<%}%>
+    	</table>
+    	</fieldset>
+	<%} %>
+	</div>
 	
 	<div id="listaCompletaStud" name="listaCompletaStud" style="display: none;">
 	<fieldset>
  		<legend>Lista completa a studentilor</legend>
     <table>
     	<tr>
-    		<td style="font-size:20px;"><b>Numar Matricol</b></td>
-    		<td style="font-size:20px;"><b>CNP</b></td>
-    		<td style="font-size:20px;"><b>Nume</b></td>
-    		<td style="font-size:20px;"><b>Prenume</b></td>
-    		<td style="font-size:20px;"><b>Forma de Finantare</b></td>
+    		<td><b>Numar Matricol</b></td>
+<!--     		<td><b>CNP</b></td> -->
+    		<td><b>Nume</b></td>
+    		<td><b>Prenume</b></td>
+    		<td><b>Specializarea</b></td>
+    		<td><b>Program de studii</b></td>
+    		<td><b>Forma de Finantare</b></td>
     	</tr>
     	<tr>
     	<%List<Student> listaStudenti=PrelucrariDB.returnStudenti(); %>
     	<%for(Student student: listaStudenti){ %>
- 			<td><input type="text" value="<%=student.getNumar_matricol() %>" style="font-size:20px;" disabled size=5/></td>
- 			<td><input type="text" value="<%=student.getCnp() %>" style="font-size:20px;" disabled size=13/></td>   
- 			<td><input type="text" value="<%=student.getNume() %>" style="font-size:20px;" disabled size=15/></td>
- 			<td><input type="text" value="<%=student.getPrenume() %>" style="font-size:20px;" disabled size=20/></td>
- 			<td><input type="text" value="<%=student.getForma_finantare() %>" style="font-size:20px;" disabled size=5/></td>
+ 			<td><input type="text" value="<%=student.getNumar_matricol() %>" disabled size=5/></td>
+<%--  			<td><input type="text" value="<%=student.getCnp() %>" disabled size=13/></td>    --%>
+ 			<td><input type="text" value="<%=student.getNume() %>" disabled size=15/></td>
+ 			<td><input type="text" value="<%=student.getPrenume() %>" disabled size=20/></td>
+ 			<td><input type="text" value="<%=PrelucrariDB.returnSpecializareaStudentului(student.getNumar_matricol()).getDenumire_specializare()%>" disabled size=20/></td>
+ 				<td><input type="text" value="<%=PrelucrariDB.returnSpecializareaStudentului(student.getNumar_matricol()).getProgram_studii()%>" disabled size=20/></td>
+ 			<td><input type="text" value="<%=student.getForma_finantare() %>" disabled size=5/></td>
     	</tr>
     	<%}%>
     	</table>
@@ -134,6 +175,7 @@
 	    </table>
 	    </fieldset>
   	</div>
+  	
   	<fieldset>
   		<legend>Cauta un student</legend>
 	    	<table align="left">
@@ -168,12 +210,14 @@
 	</table>
     <%}%> 
     </fieldset>
-    </form> 
+  </form> 
 </div>  
 </div>
 <script>
-function showFunctionAdd(camp) {
+function showFunctionAdd(camp,ascuns1) {
     var x = document.getElementById(camp);
+    var y = document.getElementById(ascuns1);
+    y.style.display = "none";
     if (x.style.display === "none") {
         x.style.display = "block";
     } 

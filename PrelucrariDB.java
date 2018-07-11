@@ -144,6 +144,35 @@ public class PrelucrariDB {
 			return specializare;		
 		}
 	
+		public static Specializare returnSpecializareaStudentului(int matricol){	
+			Connection con=ConexiuneDB.conectare();	
+			Specializare specializare=new Specializare();
+			try{
+				if(con!=null){
+				PreparedStatement stmt= con.prepareStatement("SELECT * FROM `specializare` join grupa on grupa.specializare_cod_specializare=specializare.cod_specializare join student on grupa.id_grupa=student.grupa_id_grupa where numar_matricol=?");
+				stmt.setInt(1,matricol);
+				System.out.println(stmt);
+				ResultSet rs=stmt.executeQuery();
+				while(rs.next())  
+				{	
+					
+					specializare.setCod_specializare(Integer.parseInt(rs.getString("cod_specializare")));
+					specializare.setDenumire_specializare(rs.getString("denumire_specializare"));
+					specializare.setProgram_studii(rs.getString("program_studii"));	
+					
+				}
+				System.out.println(specializare.getCod_specializare());
+				ConexiuneDB.closeResources(con, rs, stmt);
+				}	
+				
+			}
+			catch(SQLException e)
+			{
+				e.printStackTrace();
+			}	
+			return specializare;		
+		}	
+		
 	//returneaza lista anilor universitari
 	public static List<AnUniversitar> returnAni(){
 		List<AnUniversitar> listaAni=new ArrayList<AnUniversitar>();
@@ -991,6 +1020,37 @@ public class PrelucrariDB {
 						e.printStackTrace();
 					}	
 					return student;
+				}
+				
+				public static List<Student> returnStudentiSpecializare(int cod_specializare)
+				{
+					List<Student> studentiSpecializare=new ArrayList<Student>();
+					Connection con=ConexiuneDB.conectare();		
+					try{
+						if(con!=null){
+						PreparedStatement stmt= con.prepareStatement("SELECT * FROM student join grupa on student.grupa_id_grupa=grupa.id_grupa join specializare on specializare.cod_specializare=grupa.specializare_cod_specializare where cod_specializare=?");
+						stmt.setInt(1, cod_specializare);
+						ResultSet rs=stmt.executeQuery();
+						while(rs.next())  
+						{		
+							Student student=new Student();
+							student.setNumar_matricol(Integer.parseInt(rs.getString("numar_matricol")));	
+							student.setCnp(rs.getString("cnp"));
+							student.setNume(rs.getString("nume"));
+							student.setPrenume(rs.getString("prenume"));
+							student.setForma_finantare(rs.getString("forma_finantare"));
+							studentiSpecializare.add(student);
+							
+						}
+						ConexiuneDB.closeResources(con, rs, stmt);
+						}	
+						
+					}
+					catch(SQLException e)
+					{
+						e.printStackTrace();
+					}	
+					return studentiSpecializare;
 				}
 				
 				public static List<Cont> returnConturi(){
