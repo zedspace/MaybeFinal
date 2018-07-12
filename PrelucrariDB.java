@@ -1110,6 +1110,37 @@ public class PrelucrariDB {
 					}	
 					return cont;
 				}
+			
+			public static Cont returnCont(String nume_utilizator){
+				
+				Cont cont=new Cont();
+				Connection con=ConexiuneDB.conectare();		
+				try{
+					if(con!=null){
+					PreparedStatement stmt= con.prepareStatement("select * from cont where nume_utilizator=?");
+					stmt.setString(1,nume_utilizator);
+					ResultSet rs=stmt.executeQuery();
+					while(rs.next())  
+					{	
+				
+						cont.setUtilizator(rs.getString("nume_utilizator"));
+						cont.setParola(rs.getString("parola"));
+						cont.setMarca(Integer.parseInt(rs.getString("profesor_marca")));
+						cont.setInformatii(rs.getString("alte_infromatii"));
+						cont.setNumar_matricol(Integer.parseInt(rs.getString("student_numar_matricol")));
+					
+					}
+					ConexiuneDB.closeResources(con, rs, stmt);
+					}
+				}
+				catch(SQLException e)
+				{
+					e.printStackTrace();
+				}	
+				return cont;
+			}
+			
+			
 				//prelucrari departamente
 				public static void insertDepartament(String denumire_deparatment)
 				{
