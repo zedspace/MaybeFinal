@@ -49,12 +49,10 @@ public class ProfesorServlet extends HttpServlet {
 				}
 			else 
 				request.setAttribute("notFound", "Profesorul nu exista");
-			request.getRequestDispatcher("profesori.jsp").forward(request,response);
+	
 		}
-		if(request.getParameter("adaugaProf")!=null)
-		{
-			
-			if(request.getParameter("nume_prof")!=null&&request.getParameter("prenume_prof")!=null&&request.getParameter("nume_prof")!=""&&request.getParameter("prenume_prof")!=""){
+	
+		if(request.getParameter("nume_prof")!=null&&request.getParameter("prenume_prof")!=null&&request.getParameter("nume_prof")!=""&&request.getParameter("prenume_prof")!=""){
 				profesorDuplicat=PrelucrariDB.returnProfesorDublura(request.getParameter("nume_prof"),request.getParameter("prenume_prof"),request.getParameter("titulatura_prof"),request.getParameter("dep_add"));
 				if(!profesorDuplicat.isEmpty())
 				{
@@ -64,14 +62,14 @@ public class ProfesorServlet extends HttpServlet {
 				else
 				{
 					PrelucrariDB.insertProfesor(request.getParameter("nume_prof"), request.getParameter("prenume_prof"), request.getParameter("titulatura_prof"), request.getParameter("dep_add"));
-					request.setAttribute("succes", "S-a inserat profesorul "+request.getParameter("nume_prof")+" "+request.getParameter("prenume_prof"));
+					request.setAttribute("succes", "Profesorul "+request.getParameter("nume_prof")+" "+request.getParameter("prenume_prof")+" a fost inserat cu succes!");
 					System.out.println("S-a inserat profesorul "+request.getParameter("nume_prof")+" "+request.getParameter("prenume_prof"));
 				}
 			}
-			else
-				request.setAttribute("incomplet", "Toate campurile sunt obligatorii");
-			request.getRequestDispatcher("profesori.jsp").forward(request,response);
-		}
+//			else
+//				request.setAttribute("incomplet", "Toate campurile sunt obligatorii");
+	
+		
 		
 		if(request.getParameter("cautaFiltru")!=null)
 		{
@@ -88,8 +86,25 @@ public class ProfesorServlet extends HttpServlet {
 			}
 			else
 				request.setAttribute("incomplet", "Imposibil de aplicat filtrul!");
-			request.getRequestDispatcher("profesori.jsp").forward(request,response);
+	
 		}
+		
+		String an_universitar = request.getParameter("an_universitar");
+		String disciplina = request.getParameter("disciplina");
+		String an_studiu = request.getParameter("an_studiu");
+		String specializare = request.getParameter("specializare");
+		String grupa = request.getParameter("grupa");
+		String profesor = request.getParameter("profesor");
+		if(an_universitar!=null && an_universitar!="" && disciplina!=null && disciplina!="" && an_studiu!=null && an_universitar!="" && specializare!=null && specializare!="" && grupa!=null && grupa!="" && profesor!=null && profesor!="")
+		 {
+			PrelucrariDB.insertPreda(Integer.parseInt(profesor), Integer.parseInt(disciplina), Integer.parseInt(an_universitar), Integer.parseInt(grupa));
+			request.setAttribute("succes", "Profesorul "+PrelucrariDB.returnProfesorInfo(Integer.parseInt(profesor)).getTitulatura()+" "+PrelucrariDB.returnProfesorInfo(Integer.parseInt(profesor)).getNume()+ " "+ PrelucrariDB.returnProfesorInfo(Integer.parseInt(profesor)).getPrenume()+" a fost alocat disciplinei "+PrelucrariDB.returnDisciplina(Integer.parseInt(disciplina)));
+		 }
+		else
+		{
+			request.setAttribute("invalid", "Nu s-a putut realiza alocarea profesorului la disciplina!");
+		}
+		request.getRequestDispatcher("profesori.jsp").forward(request,response);
 	}
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
