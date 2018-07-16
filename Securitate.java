@@ -113,4 +113,35 @@ public class Securitate {
 			}
 		return id;
 	}
+	
+	private static final int[] chain = {
+		1941, 12394, 23093, 9023, 2111, 193, 93, 193
+	};
+	
+	public static String criptare(String key){
+		String rezultat="";
+		char ch;
+		int ck=0;
+		for(int i=0;i< key.length();i++){
+			if(ck >= chain.length - 1) ck=0;
+			ch = key.charAt(i);
+			ch += chain[ck];
+			rezultat +=ch;
+		}
+		return rezultat;
+	}
+	
+	public static String decriptare(String key){
+		String rezultat="";
+		char ch;
+		int ck = 0;
+		for(int i=0;i< key.length();i++){
+			if(ck>= chain.length - 1) ck=0;
+			ch = key.charAt(i);
+			ch -= chain[ck];
+			rezultat +=ch;
+			ck++;
+		}
+		return rezultat;
+	}
 }

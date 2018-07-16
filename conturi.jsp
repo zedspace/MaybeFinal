@@ -1,3 +1,4 @@
+<%@page import="database.Securitate"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
     <%@ page import="java.util.*" %>
@@ -51,7 +52,7 @@
     	<%List<Cont> listaConturi=PrelucrariDB.returnConturi(); %>
     	<%for(Cont cont: listaConturi){ %>
  			<td><%=cont.getUtilizator() %></td>
- 			<td><%=cont.getParola() %></td>   
+ 			<td><%=Securitate.decriptare(cont.getParola())%></td>   
  			<td><%=cont.getInformatii() %></td>
  			<td><%=cont.getMarca() %></td>
  			<td><%=cont.getNumar_matricol() %></td>
